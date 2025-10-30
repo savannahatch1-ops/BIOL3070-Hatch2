@@ -1,0 +1,61 @@
+---
+title: "Final Prohect"
+author: "Savanna Hatch"
+date: "`r Sys.Date()`"
+output:
+  github_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# ABSTRACT
+
+
+# BACKGROUND
+```{r plot1, eval=FALSE}
+```
+
+# STUDY QUESTION and HYPOTHESIS
+
+## Questions  
+
+
+## Hypothesis 
+
+
+## Prediction
+
+
+# METHODS
+```{r age and deaths, fig.width = 6, fig.height = 4}
+library(ggplot2)
+
+age <- data.frame(category = c(" 0-4", " 5-11", "12-17", "18-24", "25-34", "35-64", "65+"), value = c(1.4, 2.4, 2.0, 3.8, 6.4, 11.5, 27.1))
+
+ggplot(age, aes(x = category, y = value)) +
+  geom_bar(stat = "identity", fill = "lightblue") + # stat="identity" uses y-values directly
+  labs(title = "Asthma Deaths By Age", x = "Age (Years)", y = "Asthma-Related Deaths Per Million")
+
+```
+
+
+```{r first analysis, eval=FALSE}
+
+```
+
+
+
+```{r second analysis, eval= FALSE}
+
+```
+
+
+# DISCUSSION
+
+
+# CONCLUSION
+
+
+# REFERENCES     
