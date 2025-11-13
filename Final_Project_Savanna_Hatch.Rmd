@@ -1,5 +1,5 @@
 ---
-title: "Final Prohect"
+title: "Final Project"
 author: "Savanna Hatch"
 date: "`r Sys.Date()`"
 output:
@@ -10,37 +10,140 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+
+#data for map
+
+asthma_data <- data.frame(
+  state = c("Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut",
+            "Delaware","District of Columbia","Florida","Georgia","Hawaii","Idaho","Illinois",
+            "Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts",
+            "Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada",
+            "New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota",
+            "Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina",
+            "South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington",
+            "West Virginia","Wisconsin","Wyoming"),
+  
+  number = c(378702,58742,555997,243032,2629546,500090,356651,
+             78980,60410,1646583,802783,103228,161970,856488,
+             574447,238689,237705,377365,351940,146031,499134,633126,
+             935666,434473,211055,497216,102617,121412,251193,
+             148330,644536,171212,1611027,764909,61944,
+             1042354,373879,389831,1033741,117252,368883,
+             56630,636322,1760654,266105,68112,671051,667228,
+             181395,503318,46973),
+  
+  prevalence_raw = c("9.6 (0.59)","10.7 (0.58)","9.7 (0.49)","10.5 (0.57)","8.7 (0.39)","10.8 (0.43)","12.4 (0.51)",
+                     "9.9 (0.64)","11.1 (0.77)","9.3 (0.53)","9.6 (0.48)","9.1 (0.45)","11.1 (0.51)","8.7 (0.58)",
+                     "11.0 (0.39)","9.7 (0.42)","10.7 (0.41)","10.8 (0.68)","10.0 (0.55)","13.1 (0.52)","10.4 (0.38)","11.3 (0.43)",
+                     "11.9 (0.44)","9.9 (0.32)","9.4 (0.63)","10.4 (0.49)","11.7 (0.51)","8.1 (0.46)","10.1 (0.79)",
+                     "13.1 (0.64)","8.9 (0.43)","10.4 (0.62)","10.3 (0.34)","9.2 (0.62)","10.4 (0.60)",
+                     "11.4 (0.38)","12.3 (0.54)","11.5 (0.51)","10.1 (0.67)","13.3 (0.64)","9.0 (0.40)",
+                     "8.3 (0.75)","11.7 (0.61)","7.9 (0.37)","11.0 (0.43)","12.9 (0.53)","9.9 (0.46)","10.9 (0.26)",
+                     "12.9 (0.61)","10.9 (0.42)","10.5 (0.65)")
+)
+
+library(dplyr)
+library(stringr)
+
+asthma_data <- asthma_data %>%
+  mutate(
+    prevalence = as.numeric(str_extract(prevalence_raw, "^[0-9.]+")),
+    SE = as.numeric(str_extract(prevalence_raw, "(?<=\\().+?(?=\\))")),
+    state_lower = tolower(state),
+    region = state.region[match(state, state.name)]
+  )
+
+asthma_data <- na.omit(asthma_data)
+
 ```
+
 # ABSTRACT
 
 
 # BACKGROUND
-```{r plot1, eval=FALSE}
+Asthma is a chronic disease, presented as inflammation in the lungs and airways, that typically shows symptoms such as coughing, shortness of breath, tightness in the chest, and wheezing (American Thoracic Society). It also involves remodeling of the airway. This is seen in the thickening of the airway walls (Elias et. al, 1999). There are many different triggers that can lead to asthmatic symptoms.  These triggers include things such as strong odors, chemicals, dust, and allergens (Win and Hussain, 2009). Asthma, along with other allergic diseases has become more prevalent as urbanization increases (Kudo et. al, 2013). In many areas that are experiencing rapid urbanization and westernization, asthma prevalence has also increased (Paciência and Cavaleiro, 2020).  This paper focuses on the impact of higher population densities in urbanized areas on the asthma prevalence within that population.
+
+```{r bar plot per state, fig.align='center', fig.width = 6, fig.height = 8}
+
+library(ggplot2)
+
+ggplot(asthma_data, aes(x = reorder(state, prevalence), y = prevalence)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Asthma Prevalence by U.S. State",
+       x = "State",
+       y = "Asthma Prevalence (%)") +
+  theme_minimal()
 ```
+This figure shows the Asthma Prevalence percentages per U.S. state.
 
 # STUDY QUESTION and HYPOTHESIS
 
 ## Questions  
-
+Does the rate of asthma increase in areas with higher population densities?
 
 ## Hypothesis 
-
+Areas or states with a higher population density per square mile will have a higher prevalence of asthma.
 
 ## Prediction
-
+Smaller states that have high populations will have a higher prevelance of asthma, and larger states with low populations will have lower prevelance of asthma.
 
 # METHODS
-```{r age and deaths, fig.width = 6, fig.height = 4}
+
+```{r pop density graph, include=TRUE, eval=TRUE, warning=FALSE, fig.align='center', fig.width=12, fig.height=6}
+# Load data
+df <- read.csv("Comp Bio Data - Population Density (1).csv")
+names(df)
+
+# Load libraries
 library(ggplot2)
+library(viridis)  # Needed for viridis color scales
 
-age <- data.frame(category = c(" 0-4", " 5-11", "12-17", "18-24", "25-34", "35-64", "65+"), value = c(1.4, 2.4, 2.0, 3.8, 6.4, 11.5, 27.1))
+# Create plot
+ggplot(df, aes(x = Population.Per.Square.Mile, y = Percent.With.Current.Athsma, colour = State)) +
+  geom_point() +
+  scale_colour_viridis_d() +
+  theme_minimal() +
+  labs(title = "Athsma vs Population Density by State")
+```
+This plot shows the comparison by state of Population Density (per square mile) to Asthma Prevalence (Percent With Current Asthma)
 
-ggplot(age, aes(x = category, y = value)) +
-  geom_bar(stat = "identity", fill = "lightblue") + # stat="identity" uses y-values directly
-  labs(title = "Asthma Deaths By Age", x = "Age (Years)", y = "Asthma-Related Deaths Per Million")
+
+```{r prevalence by state, include=TRUE, eval=TRUE, warning=FALSE, fig.align='center', fig.width=6, fig.height=3}
+
+library(ggplot2)
+library(maps)
+library(dplyr)
+
+# Map data
+states_map <- map_data("state")
+
+# Merge map data with asthma data
+map_data <- states_map %>%
+  left_join(asthma_data, by = c("region" = "state_lower"))
+
+ggplot(map_data, aes(long, lat, group = group, fill = prevalence)) +
+  geom_polygon(color = "gray90", size = 0.3) +  # state borders
+  geom_polygon(aes(fill = prevalence), color = "white") +
+  coord_fixed(1.3) +
+ scale_fill_gradientn(
+  name = "Asthma Prevalence (%)",
+  colors = c("yellow2", "orange", "red", "red4")
+) +
+  labs(
+    title = "Asthma Prevalence by U.S. State",
+    subtitle = "Higher prevalence shown in darker colors"
+  ) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 12)
+  )
 
 ```
-
+This figure shows the prevalence of asthma by state with higher rates of asthma shown in darker colors.
 
 ```{r first analysis, eval=FALSE}
 
@@ -60,3 +163,17 @@ ggplot(age, aes(x = category, y = value)) +
 
 
 # REFERENCES     
+1. ChatGPT. OpenAI, version Jan 2025. Used as a reference for functions
+    such as ggplot(), creating the map and troubleshooting error messages. Accessed 2025-11-10.
+    
+2. Centers for Disease Control and Prevention. (2024, November 21). Most recent asthma data. U.S. Department of Health and Human Services. https://www.cdc.gov/asthma-data/about/most-recent-asthma-data.html
+
+3.https://www.atsjournals.org/doi/pdf/10.1164/rccm.2029P25
+
+4.https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2013.00263/full
+
+5.https://pmc.ncbi.nlm.nih.gov/articles/PMC7152189/
+
+6.https://www.jci.org/articles/view/8124?..&..&..&..
+
+7.https://journals.lww.com/pbj/fulltext/2020/02000/Urban_level_environmental_factors_related_to.2.aspx
