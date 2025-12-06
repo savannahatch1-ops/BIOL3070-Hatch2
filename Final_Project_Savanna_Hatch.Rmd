@@ -80,7 +80,7 @@ map_data <- states_map %>%
 
 
 # ABSTRACT
-
+Asthma is a chronic disease that results in many symptoms such as coughing, shortness of breath, and wheezing (Sockrider & Fussner, 2020).  Asthma has become more prevalent in areas that are experiencing rapid urbanization (Paciência and Cavaleiro, 2020).  This paper focuses on the whether or not areas with higher population densities in urbanized areas are a predictor for higher asthma levels.  This was done by examining recent asthma data collected by the CDC and the current population levels in both the individual states and the U.S. census regions. ANOVA tests were run to test the relations between population density by state and by region with the associated asthma prevalence rates. The test done for asthma prevalence and U.S region showed significant correlation between higher asthma rates and the Northeast region with a p-value of 0.0192. The other ANOVA tests showed no significance and were inconclusive.  It was found that there was a significant correlation between the Northeast region and asthma levels, and a boxplot of population density within the regions showed a possible correlation with higher population density.
 
 # BACKGROUND
 Asthma is a chronic disease, presented as inflammation in the lungs and airways, that typically shows symptoms such as coughing, shortness of breath, tightness in the chest, and wheezing (Sockrider & Fussner, 2020). It also involves remodeling of the airway. This is seen in the thickening of the airway walls (Elias et. al, 1999). There are many different triggers that can lead to asthmatic symptoms.  These triggers include things such as strong odors, chemicals, dust, and allergens (Win and Hussain, 2009). Asthma, along with other allergic diseases has become more prevalent as urbanization has increased (Kudo et. al, 2013). In many areas that are experiencing rapid urbanization and westernization, asthma prevalence has also increased (Paciência and Cavaleiro, 2020).  This paper focuses on the impact of higher population densities in urbanized areas on the asthma prevalence within that population.
@@ -97,7 +97,7 @@ Areas or states with a higher population density per square mile will have a hig
 Smaller states that have high populations will have a higher prevalance of asthma, and larger states with low populations will have lower prevalance of asthma.
 
 # METHODS
-Recent asthma data was collected from the Center for Disease Control (CDC) as well as the current population number and population density for each state.  Data was organized both by state and by region.  Regions consisted of West, South, Northeast, and North Central United States (Figure 1).  Asthma Prevalence was compared between states using a bar graph (Figure 2) and a map visualization (Figure 3), and then between states in relation to the overall state population (Figure 4).  Asthma Prevalence was also compared between state by Population Density per Square Mile (Figure 5), and then it was compared between region (Figure 6).  An ANOVA test was performed to determine whether there was a significant relation between individual state Population Density and Asthma Prevalence.  A second ANOVA test was run to determine if there was a significant relation between U.S. Region and Asthma Prevalence.  A Tukey pairwise comparison was performed to show which, if any, region had a significant difference from the others in the Region and Asthma Prevalence relationship. 
+Recent asthma data was collected from the Center for Disease Control (CDC) as well as the current population number and population density for each state.  Data was organized both by state and by region.  Regions consisted of West, South, Northeast, and North Central United States (Figure 1).  Asthma Prevalence was compared between states using a bar graph (Figure 2) and a map visualization (Figure 3), and then between states in relation to the overall state population (Figure 4).  Asthma Prevalence was also compared between state by Population Density per Square Mile (Figure 5), and then it was compared between region (Figure 6).  An ANOVA test was performed to determine whether there was a significant relation between individual state Population Density and Asthma Prevalence.  A second ANOVA test was run to determine if there was a significant relation between U.S. Region and Asthma Prevalence.  A Tukey pairwise comparison was performed to show which, if any, region had a significant difference from the others in the Region and Asthma Prevalence relationship. A third ANOVA test was performed to determine if there was a significant relation between the average population density per region and Asthma Prevalence.
 
 ```{r regions by color}
 #just regions
@@ -122,6 +122,7 @@ ggplot(map_data, aes(x = long, y = lat, group = group, fill = region.y)) +
        fill = "Region") +
   theme_void()
 ```
+
 Figure 1: The U.S. divided into four regions: West, South, Northeast, and North Central.
 
 ```{r bar graph, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=7}
@@ -147,7 +148,8 @@ ggplot(asthma_data, aes(x = reorder(state, prevalence), y = prevalence, fill= re
     plot.margin = margin(10, 15, 10, 15))
 
 ```
-Fidure 2: This figure shows the Asthma Prevalence percentages per U.S. state.
+
+Figure 2: This figure shows the Asthma Prevalence percentages per U.S. state.
 
 ```{r prevalence by state, include=TRUE, eval=TRUE, warning=FALSE, fig.align='center', fig.width=6, fig.height=3}
 
@@ -225,7 +227,23 @@ ggplot(asthma_data, aes(x = region, y = prevalence, fill= region)) +
 ```
 Figure 6: This figure shows the comparison of Asthma Prevalence between regions.
 
-```{r first analysis ANOVA for state population density and asthma prevalence, eval=FALSE}
+
+```{r box plot population vs region, include=TRUE, eval=TRUE, warning=FALSE, fig.align='center', fig.width=4.75, fig.height=7}
+
+library(ggplot2)
+
+ggplot(asthma_data, aes(x = region, y = pop_density_sqmile, fill= region)) +
+  geom_boxplot() +
+  labs(title = "Population Density by U.S. Region",
+       x = "Region",
+       y = "Population Density (square mile)",
+       fill = "Region") +
+  theme_minimal()
+
+```
+Figure 7: This figure shows the comparison of population density between regions.
+
+```{r first analysis ANOVA test for state population density and asthma prevalence, eval=FALSE}
 
 # load necessary libraries
 
@@ -244,7 +262,7 @@ summary(m1)
 ```
 
 
-```{r second analysis ANOVA by region and pairwise comparison, eval= FALSE}
+```{r second analysis ANOVA test by region and pairwise comparison, eval= FALSE}
 
 # load necessary libraries
 
@@ -267,10 +285,25 @@ pairs(emmeans(m2, "region"))
 
 ```
 
+```{r third analysis ANOVA test for region population density and asthma prevalence, eval=FALSE}
+
+# create a linear model for average population density per region and asthma prevalence
+
+r1 <- lm(prevalence ~ density, data=region_data)
+
+# perform statistical test
+
+Anova(r1)
+summary(r1)
+
+```
+
+
 
 # DISCUSSION
 When comparing Asthma Prevalence between U.S. regions, it was found that the Northeast region had a significant difference in Asthma rates. An ANOVA test resulted in a p-value of 0.0192 showing a slight statistical significance in at least one of the regions.  This means that the Asthma Prevalence percentage can be predicted using population density in the significant regions.  A Tukey pairwise comparison showed that all regions were significantly lower than the Northeast region with p-values of 0.00419 for the South, 0.00558 for the North Central, and 0.02671 for the West region.
-When comparing Asthma Prevalence between U.S. states, it was found that there was no statistical significance in Asthma Prevalence when comparing Population Density per Square Mile.  This ANOVA test resulted in a p-value of 0.6668.  There was no evidence to show that asthma rates increase with higher population densities.
+When comparing Asthma Prevalence between U.S. states, it was found that there was no statistical significance in Asthma Prevalence in relation to Population Density per Square Mile.  This ANOVA test resulted in a p-value of 0.6668.  There was no evidence to show that asthma rates increase with higher population densities.
+When comparing Asthma Prevalence between U.S. regions, it was found that there was no statistical significance in Asthma Prevalence in relation to the average population density per region.  This ANOVA test resulted in a p-value of 0.129.  However, this test only included four variables and may be unreliable due to the lack of testable factors.
 
 # CONCLUSION
 Asthma is a chronic respiratory disease that is not predictable according to population or population density.  It is somewhat predictable according to U.S. region.  The Northeast region of the U.S. is a significant predictor of Asthma Prevalence in the states included in that region.  It is possible that future studies with increased data may show more significance in other U.S. regions that could lead to predictors other than the Northeast region of Asthma Prevalence rates.
